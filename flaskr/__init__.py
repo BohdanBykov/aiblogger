@@ -7,18 +7,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
     SECRET_KEY='dev',
-    DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
-    )
-
-    from . import db
-    db.init_app(app)
-
-    from . import auth
-    app.register_blueprint(auth.bp)
-
-    from . import blog
-    app.register_blueprint(blog.bp)
-    app.add_url_rule('/', endpoint='index')
+    DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -33,9 +22,23 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # page that say hello
-    @app.route('/hello')
+    # test page
+    @app.route('/test')
     def hello():
-        return 'Hello!'
+        return 'test page'
+
+
+    from . import db
+    db.init_app(app)
+
+    from . import auth
+    app.register_blueprint(auth.bp)
+
+    from  . import blog
+    app.register_blueprint(blog.bp)
+    app.add_url_rule('/', endpoint='index')
+    
+    # with app.app_context():
+    #     get_db()
 
     return app
