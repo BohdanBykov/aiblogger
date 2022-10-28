@@ -1,38 +1,30 @@
-import sqlite3
+from sqlalchemy import create_engine
+from sqlalchemy import Table, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import pymysql
 
 import click
 from flask import current_app, g
 
+# create_engine
+engine = create_engine(current_app.config['DB_URL'], echo=True)
 
-def get_db():
-    if 'db' not in g:
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        g.db.row_factory = sqlite3.Row
+class User:
+    __tablename__ = 'user'
 
-    return g.db
+    id = Column(Integer, primary_key=True, auto_increment=True)
+    username = Column(String(10), unique=True, nullable=False)
+    password = Column(String(100), nullable=False)
 
+    def __init__(self, id, username, password):
+        self.id = id
+        self.username = username
+        self. password = password
 
-def close_db(e=None):
-    db = g.pop('db', None)
+class Post:
+    __tablename__ = 'post'
 
-    if db is not None:
-        db.close()
-
-def init_db():
-    db = get_db()
-    
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
-
-@click.command('init-db')
-def init_db_command():
-    # clear existing data and create new tables.
-    init_db()
-    click.echo('Initialized the database.')
-
-def init_app(app):
-    app.teardown_appcontext(close_db)
-    app.cli.add_command(init_db_command)
+    id = Column(Integer, primary_key=True, auto_increment=True)
+    author_id = Column(Integer, nullable=False)
+    created = Column(nullable=False, )
