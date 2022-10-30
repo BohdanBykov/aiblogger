@@ -9,9 +9,10 @@ def create_app(test_config=None):
 
 
     # test page
-    @app.route('/test')
-    def hello():
-        return 'test page'
+    @app.route('/hello')
+    def test():
+        return ' hello! '
+
 
     from . import auth
     app.register_blueprint(auth.bp)
@@ -21,7 +22,10 @@ def create_app(test_config=None):
     app.add_url_rule('/', endpoint='index')
 
     from . import db
-    with app.app_context():
-        db.init_db()
+    db.init_app(app)
+
+    # with app.app_context():
+    #     db.get_db()
+
 
     return app

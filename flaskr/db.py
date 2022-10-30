@@ -1,30 +1,66 @@
-from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 import pymysql
 
 import click
 from flask import current_app, g
 
-# create_engine
-engine = create_engine(current_app.config['DB_URL'], echo=True)
+import sys
+sys.path.append("..")
+from instance.config import MYSQL_CONFIG 
 
-class User:
-    __tablename__ = 'user'
+def get_db():
+    if 'db' not in g:
+        cfg = MYSQL_CONFIG
+        g.db = pymysql.connect(
+            host=cfg.host,
+            user=cfg.user,
+            password=cfg.password,
+            database=cfg.database,
+            cursorclass=cfg.cursorclass
+            )
+    return g.db
 
-    id = Column(Integer, primary_key=True, auto_increment=True)
-    username = Column(String(10), unique=True, nullable=False)
-    password = Column(String(100), nullable=False)
+def close_db(e=None):
+    db = g.pop('db', None)
 
-    def __init__(self, id, username, password):
-        self.id = id
-        self.username = username
-        self. password = password
+    if db is not None:
+        db.close()
 
-class Post:
-    __tablename__ = 'post'
+def init_db():
+    db = get_db()
 
-    id = Column(Integer, primary_key=True, auto_increment=True)
-    author_id = Column(Integer, nullable=False)
-    created = Column(nullable=False, )
+    # drop tables
+    db.cursor().execute("DROP TABLE IF EXISTS post;")
+    db.cursor().execute("DROP TABLE IF EXISTS user;")
+
+
+    # create table user
+    db.cursor().execute( ' CREATE TABLE user( '
+                ' id INTEGER PRIMARY KEY AUTO_INCREMENT,'
+                ' username varchar(10) UNIQUE NOT NULL,'
+                ' password varchar(256) NOT NULL'
+                ');' )
+
+    # create table post
+    db.cursor().execute( ' CREATE TABLE post( '
+                'id INTEGER PRIMARY KEY AUTO_INCREMENT,'
+                'author_id INTEGER NOT NULL,'
+                'created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,'
+                'title varchar(20) NOT NULL,'
+                'body varchar(500) NOT NULL,'
+                'FOREIGN KEY (author_id) REFERENCES user (id)'
+                ');' )
+
+
+@click.command('init-db')
+def init_db_command():
+    init_db()
+    click.echo('Initialized the database.')
+
+def init_app(app):
+    app.teardown_appcontext(close_db)
+    #add new command to flask (use in terminal)
+    app.cli.add_command(init_db_command)
+
+
+
+
