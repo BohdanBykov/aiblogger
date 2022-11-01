@@ -1,13 +1,19 @@
+
+# lib to connect to mysql
 import pymysql
-
+# lib to add init-db command to flask server
 import click
-from flask import current_app, g
+# g is object that store db connection like g.connection
+from flask import g
 
+# make folder above visible to import
 import sys
 sys.path.append("..")
 from instance.config import MYSQL_CONFIG 
 
+# return connection to db 
 def get_db():
+    # if g doesn't store any connection yet
     if 'db' not in g:
         cfg = MYSQL_CONFIG
         g.db = pymysql.connect(
@@ -19,19 +25,21 @@ def get_db():
             )
     return g.db
 
+# remove connection from g
 def close_db(e=None):
     db = g.pop('db', None)
 
+    # if connection store comething
     if db is not None:
         db.close()
 
+# create tables
 def init_db():
     db = get_db()
 
     # drop tables
     db.cursor().execute("DROP TABLE IF EXISTS post;")
     db.cursor().execute("DROP TABLE IF EXISTS user;")
-
 
     # create table user
     db.cursor().execute( ' CREATE TABLE user( '
@@ -50,15 +58,15 @@ def init_db():
                 'FOREIGN KEY (author_id) REFERENCES user (id)'
                 ');' )
 
-
+# bind init_db function to 'init-db' option 
 @click.command('init-db')
 def init_db_command():
     init_db()
     click.echo('Initialized the database.')
 
+# add option 'init-db' to flask app
 def init_app(app):
     app.teardown_appcontext(close_db)
-    #add new command to flask (use in terminal)
     app.cli.add_command(init_db_command)
 
 
