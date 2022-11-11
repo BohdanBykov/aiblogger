@@ -21,7 +21,7 @@ def get_db():
             user=cfg.user,
             password=cfg.password,
             database=cfg.database,
-            cursorclass=cfg.cursorclass
+            cursorclass=pymysql.cursors.DictCursor
             )
     return g.db
 

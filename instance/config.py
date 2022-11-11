@@ -1,5 +1,4 @@
-import pymysql
-SECRET_KEY = '414fc94f180ccf1f26dee1bc6f160491693cbf98f64b3b4590ab81193490e643'
+
 
 # mysql config
 class MYSQL_CONFIG:
@@ -8,5 +7,4 @@ class MYSQL_CONFIG:
 	user = 'test'
 	password = 'password'
 	database = 'site'
-	cursorclass = pymysql.cursors.DictCursor
 

@@ -1,4 +1,4 @@
-#!/home/bohdan/Documents/github/aiblogger/env/bin/python
+#!/home/bohdan/github/aiblogger/env/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
