@@ -9,7 +9,7 @@ from flask import g
 # make folder above visible to import
 import sys
 sys.path.append("..")
-from instance.config import MYSQL_CONFIG 
+from instance.db_conf import MYSQL_CONFIG 
 
 # return connection to db 
 def get_db():
