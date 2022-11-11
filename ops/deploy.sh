@@ -1,13 +1,14 @@
 #!/bin/bash
-# script to deploy flask with gunicorn and nginx (ubuntu22.04)
+# script to deploy flask website with gunicorn and nginx (ubuntu22.04)
+
+# # create project folder
+# git clone https://github.com/BohdanBykov/aiblogger.git /srv/aiblogger/
 
 # install software
 apt -y update
-apt apt install -y nginx python3 python3-pip python3-virtualenv curl
+apt install -y nginx python3 python3-pip python3-virtualenv curl
 
-# create project folder
-git clone https://github.com/BohdanBykov/aiblogger.git /srv/aiblogger/
-
+# prepare project folder
 cd /srv/aiblogger
 virtualenv env
 source env/bin/activate
@@ -22,6 +23,10 @@ file /run/gunicorn.sock
 curl --unix.socket /run/gunicorn.sock localhost
 
 # set up nginx
-mv -f /home/administrator/config/nginx.conf /etc/nginx/nginx.conf
+mv -f /srv/aiblogger/ops/nginx.conf /etc/nginx/nginx.conf
 nginx -s reload
+
+# load website
+echo "result:"
+curl localhost
 
