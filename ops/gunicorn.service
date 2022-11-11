@@ -1,0 +1,17 @@
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=administrator
+Group=administrator
+WorkingDirectory=/srv/aiblogger
+ExecStart=/srv/aiblogger/env/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/nginx.sock \
+          wsgi:app
+
+[Install]
+WantedBy=multi-user.target
