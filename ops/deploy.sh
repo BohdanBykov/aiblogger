@@ -12,7 +12,7 @@ apt install -y nginx python3 python3-pip python3-virtualenv curl
 cd /srv/aiblogger
 virtualenv env
 source env/bin/activate
-pip install -r requiremenst.txt
+pip install -r requirements.txt
 
 # add gunicorn service config
 mv -f /srv/aiblogger/ops/gunicorn.socket /etc/systemd/system/gunicorn.socket
