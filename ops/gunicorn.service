@@ -10,7 +10,7 @@ WorkingDirectory=/srv/aiblogger
 ExecStart=/srv/aiblogger/env/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
-          --bind unix:/run/nginx.sock \
+          --bind unix:/run/gunicorn.sock \
           wsgi:app
 
 [Install]

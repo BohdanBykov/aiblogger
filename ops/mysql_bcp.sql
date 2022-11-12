@@ -24,10 +24,10 @@ DROP TABLE IF EXISTS `columns_priv`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `columns_priv` (
   `Host` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `Db` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
-  `User` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
-  `Table_name` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
-  `Column_name` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Db` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `User` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Table_name` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Column_name` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Column_priv` set('Select','Insert','Update','References') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`Host`,`User`,`Db`,`Table_name`,`Column_name`)
@@ -76,8 +76,8 @@ DROP TABLE IF EXISTS `db`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `db` (
   `Host` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `Db` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
-  `User` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Db` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `User` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Select_priv` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
   `Insert_priv` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
   `Update_priv` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
@@ -121,9 +121,9 @@ DROP TABLE IF EXISTS `default_roles`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `default_roles` (
   `HOST` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `USER` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `USER` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `DEFAULT_ROLE_HOST` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '%',
-  `DEFAULT_ROLE_USER` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `DEFAULT_ROLE_USER` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`HOST`,`USER`,`DEFAULT_ROLE_HOST`,`DEFAULT_ROLE_USER`)
 ) /*!50100 TABLESPACE `mysql` */ ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin STATS_PERSISTENT=0 ROW_FORMAT=DYNAMIC COMMENT='Default roles';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -174,9 +174,9 @@ DROP TABLE IF EXISTS `func`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `func` (
-  `name` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `name` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `ret` tinyint NOT NULL DEFAULT '0',
-  `dl` char(128) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `dl` char(128) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `type` enum('function','aggregate') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   PRIMARY KEY (`name`)
 ) /*!50100 TABLESPACE `mysql` */ ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin STATS_PERSISTENT=0 ROW_FORMAT=DYNAMIC COMMENT='User defined functions';
@@ -199,7 +199,7 @@ DROP TABLE IF EXISTS `global_grants`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `global_grants` (
-  `USER` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `USER` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `HOST` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
   `PRIV` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
   `WITH_GRANT_OPTION` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
@@ -342,7 +342,7 @@ UNLOCK TABLES;
 --
 
 /*!40000 ALTER TABLE `innodb_index_stats` DISABLE KEYS */;
-INSERT  IGNORE INTO `innodb_index_stats` VALUES ('mysql','component','PRIMARY','2022-11-11 11:32:16','n_diff_pfx01',0,1,'component_id'),('mysql','component','PRIMARY','2022-11-11 11:32:16','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('mysql','component','PRIMARY','2022-11-11 11:32:16','size',1,NULL,'Number of pages in the index'),('site_db','post','PRIMARY','2022-11-11 12:09:50','n_diff_pfx01',0,1,'id'),('site_db','post','PRIMARY','2022-11-11 12:09:50','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('site_db','post','PRIMARY','2022-11-11 12:09:50','size',1,NULL,'Number of pages in the index'),('site_db','post','author_id','2022-11-11 12:09:50','n_diff_pfx01',0,1,'author_id'),('site_db','post','author_id','2022-11-11 12:09:50','n_diff_pfx02',0,1,'author_id,id'),('site_db','post','author_id','2022-11-11 12:09:50','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('site_db','post','author_id','2022-11-11 12:09:50','size',1,NULL,'Number of pages in the index'),('site_db','user','PRIMARY','2022-11-11 12:09:50','n_diff_pfx01',0,1,'id'),('site_db','user','PRIMARY','2022-11-11 12:09:50','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('site_db','user','PRIMARY','2022-11-11 12:09:50','size',1,NULL,'Number of pages in the index'),('site_db','user','username','2022-11-11 12:09:50','n_diff_pfx01',0,1,'username'),('site_db','user','username','2022-11-11 12:09:50','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('site_db','user','username','2022-11-11 12:09:50','size',1,NULL,'Number of pages in the index'),('sys','sys_config','PRIMARY','2022-11-11 11:32:17','n_diff_pfx01',6,1,'variable'),('sys','sys_config','PRIMARY','2022-11-11 11:32:17','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('sys','sys_config','PRIMARY','2022-11-11 11:32:17','size',1,NULL,'Number of pages in the index');
+INSERT  IGNORE INTO `innodb_index_stats` VALUES ('mysql','component','PRIMARY','2022-11-12 14:34:40','n_diff_pfx01',0,1,'component_id'),('mysql','component','PRIMARY','2022-11-12 14:34:40','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('mysql','component','PRIMARY','2022-11-12 14:34:40','size',1,NULL,'Number of pages in the index'),('site_db','post','PRIMARY','2022-11-11 12:09:50','n_diff_pfx01',0,1,'id'),('site_db','post','PRIMARY','2022-11-11 12:09:50','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('site_db','post','PRIMARY','2022-11-11 12:09:50','size',1,NULL,'Number of pages in the index'),('site_db','post','author_id','2022-11-11 12:09:50','n_diff_pfx01',0,1,'author_id'),('site_db','post','author_id','2022-11-11 12:09:50','n_diff_pfx02',0,1,'author_id,id'),('site_db','post','author_id','2022-11-11 12:09:50','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('site_db','post','author_id','2022-11-11 12:09:50','size',1,NULL,'Number of pages in the index'),('site_db','user','PRIMARY','2022-11-11 12:09:50','n_diff_pfx01',0,1,'id'),('site_db','user','PRIMARY','2022-11-11 12:09:50','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('site_db','user','PRIMARY','2022-11-11 12:09:50','size',1,NULL,'Number of pages in the index'),('site_db','user','username','2022-11-11 12:09:50','n_diff_pfx01',0,1,'username'),('site_db','user','username','2022-11-11 12:09:50','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('site_db','user','username','2022-11-11 12:09:50','size',1,NULL,'Number of pages in the index'),('sys','sys_config','PRIMARY','2022-11-11 11:32:17','n_diff_pfx01',6,1,'variable'),('sys','sys_config','PRIMARY','2022-11-11 11:32:17','n_leaf_pages',1,NULL,'Number of leaf pages in the index'),('sys','sys_config','PRIMARY','2022-11-11 11:32:17','size',1,NULL,'Number of pages in the index');
 /*!40000 ALTER TABLE `innodb_index_stats` ENABLE KEYS */;
 
 --
@@ -350,7 +350,7 @@ INSERT  IGNORE INTO `innodb_index_stats` VALUES ('mysql','component','PRIMARY','
 --
 
 /*!40000 ALTER TABLE `innodb_table_stats` DISABLE KEYS */;
-INSERT  IGNORE INTO `innodb_table_stats` VALUES ('mysql','component','2022-11-11 11:32:16',0,1,0),('site_db','post','2022-11-11 12:09:50',0,1,1),('site_db','user','2022-11-11 12:09:50',0,1,1),('sys','sys_config','2022-11-11 11:32:17',6,1,0);
+INSERT  IGNORE INTO `innodb_table_stats` VALUES ('mysql','component','2022-11-12 14:34:40',0,1,0),('site_db','post','2022-11-11 12:09:50',0,1,1),('site_db','user','2022-11-11 12:09:50',0,1,1),('sys','sys_config','2022-11-11 11:32:17',6,1,0);
 /*!40000 ALTER TABLE `innodb_table_stats` ENABLE KEYS */;
 
 --
@@ -395,9 +395,9 @@ DROP TABLE IF EXISTS `password_history`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `password_history` (
   `Host` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `User` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `User` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Password_timestamp` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `Password` text COLLATE utf8mb3_bin,
+  `Password` text CHARACTER SET utf8mb3 COLLATE utf8mb3_bin,
   PRIMARY KEY (`Host`,`User`,`Password_timestamp` DESC)
 ) /*!50100 TABLESPACE `mysql` */ ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin STATS_PERSISTENT=0 ROW_FORMAT=DYNAMIC COMMENT='Password history for user accounts';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -443,11 +443,11 @@ DROP TABLE IF EXISTS `procs_priv`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `procs_priv` (
   `Host` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `Db` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
-  `User` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Db` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `User` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Routine_name` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
-  `Routine_type` enum('FUNCTION','PROCEDURE') COLLATE utf8mb3_bin NOT NULL,
-  `Grantor` varchar(288) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Routine_type` enum('FUNCTION','PROCEDURE') CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL,
+  `Grantor` varchar(288) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Proc_priv` set('Execute','Alter Routine','Grant') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`Host`,`User`,`Db`,`Routine_name`,`Routine_type`),
@@ -473,11 +473,11 @@ DROP TABLE IF EXISTS `proxies_priv`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `proxies_priv` (
   `Host` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `User` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `User` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Proxied_host` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `Proxied_user` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Proxied_user` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `With_grant` tinyint(1) NOT NULL DEFAULT '0',
-  `Grantor` varchar(288) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Grantor` varchar(288) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`Host`,`User`,`Proxied_host`,`Proxied_user`),
   KEY `Grantor` (`Grantor`)
@@ -609,9 +609,9 @@ DROP TABLE IF EXISTS `role_edges`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `role_edges` (
   `FROM_HOST` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `FROM_USER` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `FROM_USER` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `TO_HOST` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `TO_USER` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `TO_USER` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `WITH_ADMIN_OPTION` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
   PRIMARY KEY (`FROM_HOST`,`FROM_USER`,`TO_HOST`,`TO_USER`)
 ) /*!50100 TABLESPACE `mysql` */ ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin STATS_PERSISTENT=0 ROW_FORMAT=DYNAMIC COMMENT='Role hierarchy and role grants';
@@ -796,10 +796,10 @@ DROP TABLE IF EXISTS `tables_priv`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tables_priv` (
   `Host` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `Db` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
-  `User` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
-  `Table_name` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
-  `Grantor` varchar(288) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Db` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `User` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Table_name` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `Grantor` varchar(288) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `Table_priv` set('Select','Insert','Update','Delete','Create','Drop','Grant','References','Index','Alter','Create View','Show view','Trigger') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
   `Column_priv` set('Select','Insert','Update','References') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
@@ -814,7 +814,7 @@ CREATE TABLE `tables_priv` (
 
 LOCK TABLES `tables_priv` WRITE;
 /*!40000 ALTER TABLE `tables_priv` DISABLE KEYS */;
-INSERT INTO `tables_priv` VALUES ('172.17.0.1','site_db','site','post','root@localhost','2022-11-11 12:15:06','Select,Insert,Update,Delete,Create,Drop,References',''),('172.17.0.1','site_db','site','site_db','root@localhost','2022-11-11 12:07:54','Update',''),('172.17.0.1','site_db','site','user','root@localhost','2022-11-11 12:14:57','Select,Insert,Update,Delete,Create,Drop,References',''),('localhost','mysql','mysql.session','user','boot@','2022-11-11 11:32:17','Select',''),('localhost','sys','mysql.sys','sys_config','root@localhost','2022-11-11 11:32:17','Select','');
+INSERT INTO `tables_priv` VALUES ('172.17.0.1','site_db','site','post','root@localhost','2022-11-11 12:15:06','Select,Insert,Update,Delete,Create,Drop,References',''),('172.17.0.1','site_db','site','site_db','root@localhost','2022-11-11 12:07:54','Update',''),('172.17.0.1','site_db','site','user','root@localhost','2022-11-11 12:14:57','Select,Insert,Update,Delete,Create,Drop,References',''),('localhost','mysql','mysql.session','user','boot@','2022-11-11 11:32:17','Select',''),('localhost','sys','mysql.sys','sys_config','root@localhost','2022-11-11 11:32:17','Select',''),('localhost','site_db','site','post','root@localhost','2022-11-12 15:49:07','Select,Insert,Update,Delete,Create,Drop,References',''),('localhost','site_db','site','user','root@localhost','2022-11-12 15:49:12','Select,Insert,Update,Delete,Create,Drop,References','');
 /*!40000 ALTER TABLE `tables_priv` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -952,7 +952,7 @@ DROP TABLE IF EXISTS `user`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user` (
   `Host` char(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-  `User` char(32) COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `User` char(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
   `Select_priv` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
   `Insert_priv` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
   `Update_priv` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
@@ -990,8 +990,8 @@ CREATE TABLE `user` (
   `max_updates` int unsigned NOT NULL DEFAULT '0',
   `max_connections` int unsigned NOT NULL DEFAULT '0',
   `max_user_connections` int unsigned NOT NULL DEFAULT '0',
-  `plugin` char(64) COLLATE utf8mb3_bin NOT NULL DEFAULT 'caching_sha2_password',
-  `authentication_string` text COLLATE utf8mb3_bin,
+  `plugin` char(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT 'caching_sha2_password',
+  `authentication_string` text CHARACTER SET utf8mb3 COLLATE utf8mb3_bin,
   `password_expired` enum('N','Y') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT 'N',
   `password_last_changed` timestamp NULL DEFAULT NULL,
   `password_lifetime` smallint unsigned DEFAULT NULL,
@@ -1012,7 +1012,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES ('%','root','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'caching_sha2_password','$A$005$f0ad4Zw6V[RmS#mKd34ttdyQMwb9KACKYKIIYve8vb2FatdyqmB/Sl5Um4','N','2022-11-11 11:32:22',NULL,'N','Y','Y',NULL,NULL,NULL,NULL),('172.17.0.1','site','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$z_\nM,ypWcl!iq@ghuKyKcNXX0igiGgL5h.NH.umArxaXsMmsAST75R2EbfD','N','2022-11-11 11:55:48',NULL,'N','N','N',NULL,NULL,NULL,NULL),('localhost','mysql.infoschema','Y','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED','N','2022-11-11 11:32:17',NULL,'Y','N','N',NULL,NULL,NULL,NULL),('localhost','mysql.session','N','N','N','N','N','N','N','Y','N','N','N','N','N','N','N','Y','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED','N','2022-11-11 11:32:17',NULL,'Y','N','N',NULL,NULL,NULL,NULL),('localhost','mysql.sys','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED','N','2022-11-11 11:32:17',NULL,'Y','N','N',NULL,NULL,NULL,NULL),('localhost','root','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'caching_sha2_password','$A$005$eELO}z5jOpod-ozQLnzZ6ljtOf2ilNrrFA23Zk5pnxeGiVxDBvdAeC1/1','N','2022-11-11 11:32:22',NULL,'N','Y','Y',NULL,NULL,NULL,NULL);
+INSERT INTO `user` VALUES ('%','root','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'caching_sha2_password','$A$005$f0ad4Zw6V[RmS#mKd34ttdyQMwb9KACKYKIIYve8vb2FatdyqmB/Sl5Um4','N','2022-11-11 11:32:22',NULL,'N','Y','Y',NULL,NULL,NULL,NULL),('172.17.0.1','site','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$z_\nM,ypWcl!iq@ghuKyKcNXX0igiGgL5h.NH.umArxaXsMmsAST75R2EbfD','N','2022-11-11 11:55:48',NULL,'N','N','N',NULL,NULL,NULL,NULL),('localhost','mysql.infoschema','Y','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED','N','2022-11-11 11:32:17',NULL,'Y','N','N',NULL,NULL,NULL,NULL),('localhost','mysql.session','N','N','N','N','N','N','N','Y','N','N','N','N','N','N','N','Y','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED','N','2022-11-11 11:32:17',NULL,'Y','N','N',NULL,NULL,NULL,NULL),('localhost','mysql.sys','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED','N','2022-11-11 11:32:17',NULL,'Y','N','N',NULL,NULL,NULL,NULL),('localhost','root','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'caching_sha2_password','$A$005$eELO}z5jOpod-ozQLnzZ6ljtOf2ilNrrFA23Zk5pnxeGiVxDBvdAeC1/1','N','2022-11-11 11:32:22',NULL,'N','Y','Y',NULL,NULL,NULL,NULL),('localhost','site','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'caching_sha2_password','$A$005$JY`e?j8uBX	/b8LdPf6UjI.nQiq76HCyHeMaVo1okAMrxRuPilqBdDB','N','2022-11-12 15:46:13',NULL,'N','N','N',NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1063,4 +1063,4 @@ CREATE TABLE IF NOT EXISTS `slow_log` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-11-12 14:33:43
+-- Dump completed on 2022-11-12 15:52:24
