@@ -3,7 +3,7 @@
 # mysql config
 class MYSQL_CONFIG:
 
-	host = ''
-	user = ''
-	password = ''
-	database = ''
+	host = 'localhost'
+	user = 'site'
+	password = 'password'
+	database = 'site_db'
