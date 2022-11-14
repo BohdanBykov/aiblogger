@@ -32,7 +32,7 @@ mysql -uroot -p mysql < /srv/aiblogger/ops/site_db_bcp.sql \
 mysql -uroot -p mysql < /srv/aiblogger/ops/mysql_bcp.sql \
 	&& echo "mysql db imported"
 systemctl restart mysql \
-	$$ echo "mysql daemon restarted"
+	&& echo "mysql daemon restarted"
 
 # open db_config (user must imput values and save as db_conf.py)
 nano /srv/$PROJECT/instance/tmpl_db_conf.py;

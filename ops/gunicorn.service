@@ -4,8 +4,8 @@ Requires=gunicorn.socket
 After=network.target
 
 [Service]
-User=administrator
-Group=administrator
+User=ubuntu
+Group=ubuntu
 WorkingDirectory=/srv/aiblogger
 ExecStart=/srv/aiblogger/env/bin/gunicorn \
           --access-logfile - \
