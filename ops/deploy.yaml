@@ -1,6 +1,6 @@
 ---
   - name: deploy on ubuntu22.04 server
-    hosts: webservers
+    hosts: aws
     become: yes
     tasks:
       - name: apt update
