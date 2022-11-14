@@ -1,0 +1,96 @@
+---
+  - name: deploy on ubuntu22.04 server
+    hosts: webservers
+    become: yes
+    tasks:
+      - name: apt update
+        apt: update_cache=yes force_apt_get=yes
+    
+      - name: apt upgrade
+        apt: upgrade=dist force_apt_get=yes
+
+      - name: apt install nginx, mysql-server, curl
+        ansible.builtin.apt:
+          name: nginx, mysql-server, curl
+
+      - name: apt install python3, python3-pip, python3-virtualenv
+        ansible.builtin.apt:
+          name: python3, python3-pip, python3-virtualenv
+
+      - name: clone aiblogger repo
+        ansible.builtin.git:
+          repo: https://github.com/BohdanBykov/aiblogger.git
+          dest: /srv/aiblogger/
+
+      - name: create virtualenv
+        ansible.builtin.pip:
+          requirements: /srv/aiblogger/requirements.txt
+          virtualenv: /srv/aiblogger/env
+
+      - name: create db config
+        ansible.builtin.copy:
+          src: /srv/aiblogger/instance/tmpl_db_conf.py 
+          dest: /srv/aiblogger/instance/db_conf.py
+          remote_src: yes
+
+      - name: start mysql
+        ansible.builtin.systemd:
+          name: mysql
+          state: started
+          enabled: yes
+
+      - name: restore site_db
+        ansible.builtin.shell: mysql < /srv/aiblogger/ops/site_db_bcp.sql
+
+      - name: restore mysql db
+        ansible.builtin.shell: mysql mysql < /srv/aiblogger/ops/mysql_bcp.sql
+
+      - name: restart mysql
+        ansible.builtin.systemd:
+          state: restarted
+          daemon_reload: yes
+          name: mysql
+
+      - name: copy gunicorn socket
+        ansible.builtin.copy:
+          src: /srv/aiblogger/ops/gunicorn.socket
+          dest: /etc/systemd/system/
+          remote_src: yes
+
+      - name: copy gunicorn service
+        ansible.builtin.copy:
+          src: /srv/aiblogger/ops/gunicorn.service
+          dest: /etc/systemd/system/
+          remote_src: yes
+
+      - name: start gunicorn service
+        ansible.builtin.systemd:
+          name: gunicorn.socket
+          state: started
+          enabled: yes
+
+      - name: file (idk) /run/gunicorn.sock
+        ansible.builtin.file:
+          path: /run/gunicorn.sock
+
+      - name: trying to reach gunicorn socket
+        ansible.builtin.uri:
+          unix_socket: /run/gunicorn.sock
+          url: http://127.0.0.1/
+          return_content: yes
+          
+      - name: copy nginx config
+        ansible.builtin.copy:
+          src: /srv/aiblogger/ops/nginx.conf
+          dest: /etc/nginx/
+          force: yes
+          remote_src: yes
+
+      - name: reload nginx
+        ansible.builtin.systemd:
+          enabled: yes
+          state: restarted
+          daemon_reload: yes
+          name: nginx
+
+
