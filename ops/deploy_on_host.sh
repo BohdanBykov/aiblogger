@@ -27,7 +27,7 @@ pip install -r requirements.txt \
 systemctl start mysql.service && systemctl enable mysql.service \
 	&& echo "started mysql server"
 
-mysql -uroot -p mysql < /srv/aiblogger/ops/site_db_bcp.sql \
+mysql -uroot -p < /srv/aiblogger/ops/site_db_bcp.sql \
 	&& echo "site_db imported"
 mysql -uroot -p mysql < /srv/aiblogger/ops/mysql_bcp.sql \
 	&& echo "mysql db imported"
