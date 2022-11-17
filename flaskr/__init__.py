@@ -5,8 +5,8 @@ from flask import Flask
 def create_app():
     # create and configure the app
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'dev'
-
+    environ_config = os.environ['CONFIG']
+    app.config.from_object('config.' + environ_config)
 
     # test page
     @app.route('/hello')

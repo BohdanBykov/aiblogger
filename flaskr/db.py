@@ -1,26 +1,20 @@
-
 # lib to connect to mysql
 import pymysql
 # lib to add init-db command to flask server
 import click
 # g is object that store db connection like g.connection
-from flask import g
+from flask import g, current_app
 
-# make folder above visible to import
-import sys
-sys.path.append("..")
-from instance.db_conf import MYSQL_CONFIG 
 
 # return connection to db 
 def get_db():
     # if g doesn't store any connection yet
     if 'db' not in g:
-        cfg = MYSQL_CONFIG
         g.db = pymysql.connect(
-            host=cfg.host,
-            user=cfg.user,
-            password=cfg.password,
-            database=cfg.database,
+            host=current_app.config['DBHOST'],
+            user=current_app.config['DBUSER'],
+            password=current_app.config['DBPASS'],
+            database=current_app.config['DBNAME'],
             cursorclass=pymysql.cursors.DictCursor
             )
     return g.db
