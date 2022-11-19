@@ -1,6 +1,6 @@
 ---
   - name: deploy with docker on ubuntu22.04 server
-    hosts: vm
+    hosts: aws
     become: yes
     tasks:
 
@@ -91,7 +91,7 @@
           community.docker.docker_compose:
             project_src: /home/ubuntu/aiblogger/ops/
           register: output
-        wait mysql server to start (~0.56s)
+        # wait mysql server to start (~0.56s)
         - pause:
             minutes: 1
   
