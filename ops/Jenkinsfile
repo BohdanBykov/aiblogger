@@ -1,17 +1,13 @@
 pipeline {
-	agent any
+    stages {
 
-	stages {
-
-		stage("start ansible-playbook") {
-			
-			steps {
-				ansiblePlaybook('ops/deploy_on_docker.yaml') {
-					becomeUser('ubuntu')
-					sudo('true')
-					hostKeyChecking(false)
-				}
-			}
-		}
-	}
+        stage('run ansible playbook') {
+            steps {
+                ansiblePlaybook('ops/deploy_on_docker.yaml')
+                    become(true)
+                    becomeUser('ubuntu')
+                    
+            }           
+        }
+    }
 }
