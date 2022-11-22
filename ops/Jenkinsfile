@@ -1,8 +1,8 @@
 node {
     ansiblePlaybook( 
         playbook: 'ops/deploy_on_docker.yaml', 
-        becomeUser: 'ubuntu'
-        become: true
+        becomeUser: 'ubuntu',
+        become: true,
         hostKeyChecking: false
         )
 }
