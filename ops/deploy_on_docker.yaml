@@ -1,7 +1,7 @@
 ---
   - name: deploy with docker on ubuntu22.04 server
-    hosts: aws
-    become: yes
+#    hosts: aws
+#    become: yes
     tasks:
 
       - name: Apt update/install
