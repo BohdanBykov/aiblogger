@@ -1,7 +1,7 @@
 node {
     ansiblePlaybook( 
         playbook: 'ops/deploy_on_docker.yaml',
-        hostPattern: 'vm'
+        hostPattern: 'vm',
         become: true, 
         hostKeyChecking: false
         )
