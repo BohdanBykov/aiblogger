@@ -3,19 +3,24 @@
     hosts: aws
     become: yes
     tasks:
-      - name: apt update
-        apt: update_cache=yes force_apt_get=yes
-    
-      - name: apt upgrade
-        apt: upgrade=dist force_apt_get=yes
 
-      - name: apt install nginx, mysql-server, curl
+      - name: apt update and install nginx, mysql-server, curl
         ansible.builtin.apt:
-          name: nginx, mysql-server, curl
+          pkg: 
+            - nginx 
+            - mysql-server 
+            - curl
+          update_cache: yes
+          force_apt_get: yes
+          upgrade: dist
 
-      - name: apt install python3, python3-pip, python3-virtualenv
+
+      - name: apt install python packages
         ansible.builtin.apt:
-          name: python3, python3-pip, python3-virtualenv
+          pkg: 
+            - python3 
+            - python3-pip 
+            - python3-virtualenv
 
       - name: clone aiblogger repo
         ansible.builtin.git:
