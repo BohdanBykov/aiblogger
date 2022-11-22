@@ -1,8 +1,6 @@
 node {
     ansiblePlaybook( 
         playbook: 'ops/deploy_on_docker.yaml', 
-        sudoUser: 'ubuntu',
-        sudo: true,
         hostKeyChecking: false
         )
 }
