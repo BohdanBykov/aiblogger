@@ -6,7 +6,7 @@ pipeline {
 		stage("start ansible-playbook") {
 			
 			steps {
-				ansiblePlaybook('/ops/deploy_on_docker.yaml') {
+				ansiblePlaybook('ops/deploy_on_docker.yaml') {
 					becomeUser('ubuntu')
 					sudo('true')
 					hostKeyChecking(false)
