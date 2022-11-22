@@ -3,9 +3,14 @@ pipeline {
 
 	stages {
 
-		stage("build") {
+		stage("start ansible-playbook") {
+			
 			steps {
-				echo 'building the application'
+				ansiblePlaybook(String /ops/deploy_on_docker.yaml) {
+					becomeUser(String user = 'ubuntu')
+					sudo(boolean become = 'true')
+					hostKeyChecking(boolean hostKeyChecking = false)
+				}
 			}
 		}
 	}
