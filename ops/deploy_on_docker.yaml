@@ -1,6 +1,6 @@
 ---
   - name: deploy with docker on ubuntu22.04 server
-#    hosts: aws
+    hosts: aws
 #    become: yes
     tasks:
 
