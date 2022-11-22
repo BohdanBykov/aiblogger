@@ -1,8 +1,22 @@
-node {
-    ansiblePlaybook( 
-        playbook: 'ops/deploy_on_docker.yaml',
-        hostPattern: 'vm',
-        become: true, 
-        hostKeyChecking: false
-        )
+// node {
+//     ansiblePlaybook( 
+//         playbook: 'ops/deploy_on_docker.yaml',
+//         hostPattern: 'vm',
+//         become: true, 
+//         hostKeyChecking: false
+//         )
+// }
+
+pipeline {
+    agent any
+
+    stages {
+        stage('update aiblogger') {
+            ansiblePlaybook ('/ops/update_on_docker.yaml') {
+                hostPattern('vm'),
+                become(true),
+                hostKeyChecking(false)
+            }
+        }
+    }
 }
