@@ -1,7 +1,5 @@
 ---
   - name: deploy with docker on ubuntu22.04 server
-    hosts: aws
-    become: yes
     tasks:
 
       - name: Apt update/install
@@ -95,7 +93,6 @@
         - pause:
             minutes: 1
   
-
         - name: create site_db and site user in mysql
           community.docker.docker_container_exec:
             container: ops_db_1
