@@ -11,7 +11,7 @@ pipeline {
     agent any
 
     stages {
-        stage('update aiblogger') {
+        steps {
             ansiblePlaybook ('/ops/update_on_docker.yaml') {
                 hostPattern('vm')
                 become(true)
