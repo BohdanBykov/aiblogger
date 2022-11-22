@@ -16,7 +16,6 @@ pipeline {
                 ansiblePlaybook(
                     playbook: 'ops/update_on_docker.yaml',
                     hostKeyChecking: false,
-                    hostPattern: 'vm',
                     become: true
                     )
             

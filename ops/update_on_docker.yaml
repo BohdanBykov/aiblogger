@@ -1,5 +1,6 @@
 ---
   - name: just update repo and recreate flask container
+    hosts: vm
     tasks:
       - name: pull from aiblogger repo
         ansible.builtin.git:
