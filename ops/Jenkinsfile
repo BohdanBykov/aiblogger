@@ -13,8 +13,8 @@ pipeline {
     stages {
         stage('update aiblogger') {
             ansiblePlaybook ('/ops/update_on_docker.yaml') {
-                hostPattern('vm'),
-                become(true),
+                hostPattern('vm')
+                become(true)
                 hostKeyChecking(false)
             }
         }
