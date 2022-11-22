@@ -1,13 +1,8 @@
-pipeline {
-    stages {
-
-        stage('run ansible playbook') {
-            steps {
-                ansiblePlaybook('ops/deploy_on_docker.yaml')
-                    become(true)
-                    becomeUser('ubuntu')
-                    
-            }           
-        }
-    }
+node {
+    ansiblePlaybook( 
+        playbook: 'ops/deploy_on_docker.yaml', 
+        becomeUser: 'ubuntu'
+        become: true
+        hostKeyChecking: false
+        )
 }
