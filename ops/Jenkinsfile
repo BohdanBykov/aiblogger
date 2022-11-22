@@ -8,14 +8,16 @@
 // }
 
 pipeline {
-    agent any
-
+    agent any 
     stages {
-        steps {
-            ansiblePlaybook ('/ops/update_on_docker.yaml') {
-                hostPattern('vm')
-                become(true)
-                hostKeyChecking(false)
+        stage('run playbook') { 
+            steps {
+                ansiblePlaybook('ops/update_on_docker.yaml') {
+                    hostKeyChecking(false)
+                    hostPattern('vm')
+                    become(true)
+
+                } 
             }
         }
     }
