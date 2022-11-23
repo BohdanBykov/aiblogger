@@ -66,6 +66,13 @@
             dest: /home/ubuntu/aiblogger
             version: dev
 
+        - name: create folder in aiblogger for mysql
+          file:
+            path: /srv/aiblogger
+            state: directory
+
+        - name: create folder 
+
         - name: copy nginx.conf to aiblogger
           ansible.builtin.copy:
             src: /home/ubuntu/aiblogger/ops/configs/docker_nginx.conf
