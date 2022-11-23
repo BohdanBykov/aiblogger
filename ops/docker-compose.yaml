@@ -17,7 +17,7 @@ services:
   flask:
     build: 
       context: ../
-      dockerfile: app_Dockerfile
+      dockerfile: Dockerfile
     environment:
       - CONFIG=Docker
     command: sh -c "gunicorn --bind 0.0.0.0:8000 wsgi:app"
@@ -37,8 +37,7 @@ services:
       - 80:80
     volumes:
       - /srv/aiblogger/nginx.conf:/etc/nginx/nginx.conf
-      - /srv/aiblogger/access.log:/var/log/nginx/access.log
-      - /srv/aiblogger/error.log:/var/log/nginx/  error.log
+      - /srv/aiblogger/:/var/log/nginx
 
 networks:
   ainet:
