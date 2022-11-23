@@ -1,0 +1,16 @@
+---
+  - name: just update repo and recreate flask container
+    hosts: vm
+    tasks:
+      - name: pull from aiblogger repo
+        ansible.builtin.git:
+          repo: 'https://github.com/BohdanBykov/aiblogger.git'
+          dest: '/home/ubuntu/aiblogger'
+          force: yes
+          update: yes
+          version: dev
+
+      - name: recreate flask container
+        ansible.builtin.shell: docker compose up -d --force-recreate --build flask
+        args:
+          chdir: /home/ubuntu/aiblogger/ops
