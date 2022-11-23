@@ -1,12 +1,3 @@
-// node {
-//     ansiblePlaybook( 
-//         playbook: 'ops/deploy_on_docker.yaml',
-//         hostPattern: 'vm',
-//         become: true, 
-//         hostKeyChecking: false
-//         )
-// }
-
 pipeline {
     agent any 
     stages {

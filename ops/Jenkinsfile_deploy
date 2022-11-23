@@ -1,0 +1,16 @@
+pipeline {
+    agent any 
+    stages {
+        stage('run playbook') { 
+            steps {
+            
+                ansiblePlaybook(
+                    playbook: 'ops/deploy_on_docker.yaml',
+                    hostKeyChecking: false,
+                    become: true
+                    )
+            
+            }
+        }
+    }
+}
