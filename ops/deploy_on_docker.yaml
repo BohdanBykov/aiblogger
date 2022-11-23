@@ -1,5 +1,7 @@
 ---
   - name: deploy with docker on ubuntu22.04 server
+    hosts: vm
+    become: yes
     tasks:
 
       - name: Apt update/install
