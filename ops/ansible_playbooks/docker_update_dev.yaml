@@ -1,10 +1,11 @@
 ---
   - name: just update repo and recreate flask container
     hosts: vm
+    become: yes
     tasks:
       - name: pull from aiblogger repo
         ansible.builtin.git:
-          repo: 'https://github.com/BohdanBykov/aiblogger.git'
+          repo: 'https://github.com/BohdanBykov/aiblogger'
           dest: '/home/ubuntu/aiblogger'
           force: yes
           update: yes
