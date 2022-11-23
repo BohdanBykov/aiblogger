@@ -5,9 +5,8 @@ pipeline {
             steps {
             
                 ansiblePlaybook(
-                    playbook: 'ops/update_on_docker.yaml',
+                    playbook: 'ops/ansible_playbooks/docker_update_dev.yaml',
                     hostKeyChecking: false,
-                    become: true
                     )
             
             }
