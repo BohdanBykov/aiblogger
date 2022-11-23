@@ -71,8 +71,6 @@
             path: /srv/aiblogger
             state: directory
 
-        - name: create folder 
-
         - name: copy nginx.conf to aiblogger
           ansible.builtin.copy:
             src: /home/ubuntu/aiblogger/ops/configs/docker_nginx.conf
@@ -94,9 +92,9 @@
           community.docker.docker_compose:
             project_src: /home/ubuntu/aiblogger/ops/
           register: output
-        # wait mysql server to start (~0.56s)
+        # wait mysql server to start
         - pause:
-            minutes: 1
+            seconds: 20
   
         - name: create site_db and site user in mysql
           community.docker.docker_container_exec:
