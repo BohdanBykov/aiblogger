@@ -64,6 +64,7 @@
           ansible.builtin.git:
             repo: https://github.com/BohdanBykov/aiblogger.git
             dest: /home/ubuntu/aiblogger
+            ver: dev
 
         - name: create folder in aiblogger for mysql
           file:
