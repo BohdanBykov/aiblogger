@@ -9,7 +9,7 @@
           dest: '/home/ubuntu/aiblogger'
           force: yes
           update: yes
-          version: dev
+          version: master
 
       - name: recreate flask container
         ansible.builtin.shell: docker compose up -d --force-recreate --build flask
