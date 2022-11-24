@@ -1,9 +1,9 @@
 pipeline {
     agent any 
     stages {
-        stage('run playbook') { 
+        stage('recreate flask container') {
+            when { changeset "flaskr/*"} 
             steps {
-            
                 ansiblePlaybook(
                     playbook: 'ops/ansible_playbooks/docker_update_dev.yaml',
                     hostKeyChecking: false,
