@@ -8,7 +8,6 @@ pipeline {
                     playbook: 'ops/ansible_playbooks/docker_update_aws.yaml',
                     hostKeyChecking: false,
                     )
-
             }
         }
     }
