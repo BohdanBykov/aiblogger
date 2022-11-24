@@ -1,7 +1,12 @@
 ---
   - name: deploy with docker on ubuntu22.04 server
+<<<<<<< HEAD:ops/ansible_playbooks/docker_deploy_dev.yaml
     hosts: vm
     become: yes
+=======
+    hosts: aws
+#    become: yes
+>>>>>>> origin/master:ops/deploy_on_docker.yaml
     tasks:
 
       - name: Apt update/install
