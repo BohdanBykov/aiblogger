@@ -1,21 +1,26 @@
+import os
 # static settings
 class Config(object):
-	DEBUG = False
-	TESTING = False
-	SECRET_KEY = 'Testedsdaggefvgvwrbvbvda'
+        DEBUG = False
+        TESTING = False
 
-	DBUSER = 'site'
-	DBNAME = 'site_db'
-	DBPASS = 'password'
+        DBUSER = 'site'
+        DBNAME = 'site_db'
 
 # when flask and mysql on one host
 class Host(Config):
-	DBHOST = 'localhost'
+        DBHOST = 'localhost'
+        DBPASS = 'password'
+        SECRET_KEY = 'dev'
 
-# when you use docker compose 
-class Docker(Config):
-	DBHOST = '172.18.0.2'
+# when mysql and flask in docker compose
+class Dev(Config):
+        DBHOST = '172.18.0.2'
+        DBNAME = 'password'
+        SECRET_KEY = 'dev'
 
-# when flask on host but mysql in container
-class DbInDocker(Config):
-	DBHOST = '172.17.0.1'
+# when mysql server remote
+class Prod(Config):
+        DBHOST = os.environ['DBHOST']
+        DBPASS = os.environ['DBPASS']
+        SECRET_KEY = os.environ['SECRET_KEY']
