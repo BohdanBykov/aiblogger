@@ -2,7 +2,7 @@
   - name: deploy with docker on ubuntu22.04 server
     hosts: aws
     become: yes
-
+    
     tasks:
 
       - name: Apt update/install
@@ -92,26 +92,13 @@
         - name: docker compose up
           community.docker.docker_compose:
             project_src: /home/ubuntu/aiblogger/ops/
+          
+          # aws:vars in hosts
+          environment:
+            DBHOST: "{{ mysql_host }}"
+            DBPASS: "{{ mysql_pass }}"
+            SECRET_KEY: "{{ secret_key }}"
           register: output
-        # wait mysql server to start
-        - pause:
-            seconds: 20
-  
-        - name: create site_db and site user in mysql
-          community.docker.docker_container_exec:
-            container: ops_db_1
-            command: |
-              mysql -uroot -ppassword -e "
-              CREATE DATABASE site_db;
-              CREATE USER 'site'@'172.18.0.3' IDENTIFIED BY 'password';
-              GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES ON `site_db`.`post` TO `site`@`172.18.0.3`;
-              GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES ON `site_db`.`user` TO `site`@`172.18.0.3`;
-              "
-
-        - name: initialize the database for flask
-          community.docker.docker_container_exec:
-            container: ops_flask_1
-            command: /bin/sh -c "flask init-db"
 
         - name: get response from aiblogger site
           shell: curl localhost
