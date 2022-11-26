@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: 'mon-ndexp'
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      net:
+        ipv4_address: 172.22.0.2
+    ports:
+      - 9100:9100
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mon-prmt
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      net:
+        ipv4_address: 172.22.0.3
+    ports:
+      - 9090:9090
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: mon-grafana
+    restart: unless-stopped
+    networks:
+      net:
+        ipv4_address: 172.22.0.4
+    ports:
+      - 3000:3000
+
+volumes:
+  prometheus_data: {}
+networks:
+  net:
+    ipam:
+      config:
+       - subnet: 172.22.0.0/16
