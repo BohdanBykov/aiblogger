@@ -203,6 +203,7 @@ Flask is a simple web framework written in python.
 
 ***
 - ### Run application
+
 	 To run the application you should have installed flask and pymysql packages. I recommend using python venv.
 	 3 commands below will create py venv activate it and install all packages from requirements.txt
 	 ```sh
@@ -231,18 +232,17 @@ Flask is a simple web framework written in python.
  
  ***
 - ### Create the application (\_\_init\_\_.py)
-
 	 Name of this file means that it will start first in folder.
 
-	 Firstly of course we import Flask class. Also we import os package to use environment variables.
-	 
+	 #### Import packages
 	 ```python
 	from flask import Flask 
 	import os
 	```
-
-	 Next step is to create an instance of the Flask class, and give the name of our application.
+	 - flask - is main framework library
+	 - os - library we will use in create_app() function to get environment varibles
 	 
+	 #### create_app(), function that defines app
 	```python
 	def create_app():
 	    app = Flask(__name__)
@@ -253,8 +253,7 @@ Flask is a simple web framework written in python.
 	 As you can see, the argument \_\_name\_\_ will store the name of our application. 
 	 Also you can see that our app is defined in the create_app() function, it is not necessarily but in future it will be very useful.
 
-	 Next step is to define functions that will operate on requests the application receives.
-	 
+	 #### @app.route(), decorator that connect url to function
 	```python
 	@app.route('/hello')
 	def test():
@@ -267,7 +266,7 @@ Flask is a simple web framework written in python.
 - ### Set up database connection (db.py)
 	 This file contains functions that work with MySQL database, create and delete connections, and initialize tables that aiblogger need to store data.
 
-	 #### At the start of the file we import packages.
+	 #### Import packages
 	 ```python
 	import pymysql
 	import click
@@ -347,8 +346,7 @@ Flask is a simple web framework written in python.
 		- title 
 		- body
 
-	 #### init-db
-	 Next functions we need to add the init-db command in flask cli command list.
+	 #### init-db cli command
 	 
 	 ```python
 	@click.command('init-db')
@@ -367,9 +365,166 @@ Flask is a simple web framework written in python.
 
 ***
 - ### Implement authentication(auth.py)
+	 In auth.py we create registration, authentication and logout pages. Also functions that checks is user logged in and decorator that block function if user didn't log in.
 
+	 #### Import packages
+	 ```python
+	import functools
+	from flask import (
+	    Blueprint, flash, g, redirect, render_template, request, session, url_for
+	)
+	from werkzeug.security import check_password_hash, generate_password_hash
+	from flaskr.db import get_db
+	```
+	 - functools - library that we will use to create login_required decorator
+	 - flask (...) - couple of libraries that provide functionality to work with html templates and requests.
+	 - werkzeug.security - packages we will use to generate and check hashed user passwords
+	 - get_db - function from db.py that return connection to database
 
+	 #### register(), function that save user to database
+	 ```python 
+	@bp.route('/register', methods=('GET', 'POST'))
+	def register():
+	    if request.method == 'POST':
+	        username = request.form['username']
+	        password = request.form['password']
+	        db = get_db()
+	        error = None
+	```
+	 Decorator @bp.route() will transmit GET and POST html requests from url '/register' to function.
+	 First if triggered when user press button 'Register'(send information).
+	 In the body of this if statement we define variables username/password with values from register form.
+	 Next get connection and name it db, and define error var as a trigger to last if in register function.
 
+	 ```python
+			if not username:
+				error = 'Username is required'
+			if not password:
+				error = 'Password is required'
+    ```
+	 Two if statements above create error message if username/password vars from previous if statement are emty (user didn't enter them)
+
+	 ```python
+			if error is None:
+				try:
+					db.cursor().execute(
+					     "INSERT INTO user (username, password) VALUES(%s,%s)",
+					     (username, generate_password_hash(password)),
+					)
+				     db.commit()
+					except db.IntegrityError:
+					     error = f"User {username} is already registered"
+					else:
+				          return redirect(url_for('auth.login'))
+			flash(error) 
+    ```
+	 This if statement checks is var error defined previously is equal to None.
+	 Next function try to execute SQL script that will add to user table values of username and password vars, but password will be hashed by function from werkzeug.security package.
+	 If SQL execution was failed by IntegrityError, to error var will be added a message means username is already in the database.
+	 Or if it was succesfull user will be automatically redirected to login page.
+	 flash() funtion return value of error var if it wasn't None before if statement above.
+
+	 ```python
+		return render_template('auth/register.html') 
+	```
+	 register() function return html template from flaskr/templates/auth directory if user sends GET request.
+
+	 #### login(), function search username/password written by user in db
+	 ```python
+	@bp.route('/login', methods=('GET','POST'))
+	def login():
+		if request.method == 'POST':
+		     username = request.form['username']
+			password = request.form['password']
+		     db = get_db().cursor()
+			error = None
+		     select = db.execute(
+			     'SELECT * FROM user WHERE username = %s', (username,)
+			)
+		     user = db.fetchone()
+	```
+	 Decorator @bp.route() will transmit GET and POST html requests from url '/login' to function.
+	 First if triggered when user press button 'Log In'(send information).
+	 In the body of this if statement we define variables username/password with values from login form.
+	 Next get connection, name it db and add cursor() because we will use execute() separatly.
+	 Define error var with default value None like in register() function.
+	 Next step execute select SQL request that will return row with value from username var.
+	 Finally define user var that will store data from previous request as a tuple.
+
+	 ```python
+		     if user is None:
+				error = 'Incorrect username'
+			elif not check_password_hash(user['password'], password):
+			     error = 'Incorrect password'
+	```
+	 Two if statements above create error message if username/password vars from previous if statement are emty (user didn't enter them)
+	 
+	 ```python
+			if error is None:
+				session.clear()
+				session['user_id'] = user['id']
+				return redirect(url_for('index'))
+			flash(error)
+
+    ```
+	 This if statement checks is var error defined previously is equal to None.
+	 If it is default session will be cleared.(dict that stores data acrooss requests of current session)
+	 After to 'user_id' key of session object we will add id of current user from database.
+	 This allows browser to save cookie for registered users.
+	 If login was succesfull user will be redirected to index(blog.py) page, else will be value of error var will be showed on the login page.
+
+    ```python
+		return render_template('auth/login.html') 
+	```
+	 login() function return html template(page) from flaskr/templates/auth directory if user sends GET request.
+
+	 #### load_logged_in_user(), load data about user to g.user object
+	 ```python
+	@bp.before_app_request
+	def load_logged_in_user():
+		user_id = session.get('user_id')
+
+		if user_id is None:
+		     g.user = None
+		else:
+			db = get_db().cursor()
+			select = db.execute(
+				'SELECT * FROM user WHERE id = %s', (user_id,)
+			)
+			g.user = db.fetchone()
+	```
+	 Decorator @bp.before_app_requests() will activate function no matter what page user visited.
+	 Firstly we define user_id var with value from session 'user_id' key.
+	 First if statement checks is user have not user_id in session object.(means user is not logged in)
+	 Else data from row with current user's id  will be added as a tuple to g.user object that stores information only for current session.
+
+	 #### logout(), delete data about user for current session
+	 ```python
+	@bp.route('/logout')
+	def logout():
+	    session.clear()
+	    return redirect(url_for('index'))
+
+	```
+	 Decorator @bp.route() will transmit html requests from url '/logout' to function.
+	 session.clear() function removes user_id from the session object, so load_logged_in_user() won't load user info and add it to g.user.
+
+	 #### login_requirred(), decorator function that checks is user logged in
+	 ```python
+	def login_required(view):
+	@functools.wraps(view)
+	def wrapped_view(**kwargs):
+		if g.user is None:
+			return redirect(url_for('auth.login'))
+		return view(**kwargs)
+	return wrapped_view 
+	 ``` 
+	 Define function, view means function with what decorator is used,  we will use it with blog.py functions.
+	 Next using functools we register login_requirred() as a decorator.
+	 wrapped_view() is function will be called by our decorator, (\*\*kwargs) means it can handle couple of views at the same time
+	 If g.user doesn't know current user, login_reqquired() will redirect user to authentication page.
+	 If g.user is defined decorator login_requirred() will return result of function on with it used for. 
+	 
 ***
 To be continued...))
 
