@@ -381,6 +381,15 @@ Flask is a simple web framework written in python.
 	 - werkzeug.security - packages we will use to generate and check hashed user passwords
 	 - get_db - function from db.py that return connection to database
 
+	 #### define authentication blueprint
+	 ```python
+	bp = Blueprint('auth', __name__, url_prefix='/auth') 
+	```
+	 Blueprint is the html file/template, default path is flaskr/templates.
+	 We create blueprint for authentication pages, path to them will be flaskr/templates/auth.
+	 \_\_name\_\_ store name of our app, which will use this template.
+	 url_prefix means that this blueprint will be used with urls after '/auth' (/auth/login /auth/register)
+	 
 	 #### register(), function that save user to database
 	 ```python 
 	@bp.route('/register', methods=('GET', 'POST'))
@@ -444,12 +453,12 @@ Flask is a simple web framework written in python.
 		     user = db.fetchone()
 	```
 	 Decorator @bp.route() will transmit GET and POST html requests from url '/login' to function.
-	 First if triggered when user press button 'Log In'(send information).
+	 First if triggered when the user presses the button 'Log In'(send information).
 	 In the body of this if statement we define variables username/password with values from login form.
 	 Next get connection, name it db and add cursor() because we will use execute() separatly.
 	 Define error var with default value None like in register() function.
 	 Next step execute select SQL request that will return row with value from username var.
-	 Finally define user var that will store data from previous request as a tuple.
+	 Finally define a user var that will store data from previous requests as a tuple.
 
 	 ```python
 		     if user is None:
@@ -457,7 +466,7 @@ Flask is a simple web framework written in python.
 			elif not check_password_hash(user['password'], password):
 			     error = 'Incorrect password'
 	```
-	 Two if statements above create error message if username/password vars from previous if statement are emty (user didn't enter them)
+	 Two if statements above create error message if username/password vars from previous if statement are empty (user didn't enter them)
 	 
 	 ```python
 			if error is None:
@@ -467,16 +476,16 @@ Flask is a simple web framework written in python.
 			flash(error)
 
     ```
-	 This if statement checks is var error defined previously is equal to None.
-	 If it is default session will be cleared.(dict that stores data acrooss requests of current session)
-	 After to 'user_id' key of session object we will add id of current user from database.
-	 This allows browser to save cookie for registered users.
-	 If login was succesfull user will be redirected to index(blog.py) page, else will be value of error var will be showed on the login page.
+	 This if statement checks if var error defined previously is equal to None.
+	 If it is default session will be cleared.(dict that stores data across requests of current session)
+	 After the 'user_id' key of the session object we will add the id of the current user from the database.
+	 This allows browsers to save cookies for registered users.
+	 If login was successful the user will be redirected to the index(blog.py) page, else the value of error var will be shown on the login page.
 
     ```python
 		return render_template('auth/login.html') 
 	```
-	 login() function return html template(page) from flaskr/templates/auth directory if user sends GET request.
+	 login() function returns html template(page) from flaskr/templates/auth directory if the user sends a GET request.
 
 	 #### load_logged_in_user(), load data about user to g.user object
 	 ```python
@@ -493,8 +502,8 @@ Flask is a simple web framework written in python.
 			)
 			g.user = db.fetchone()
 	```
-	 Decorator @bp.before_app_requests() will activate function no matter what page user visited.
-	 Firstly we define user_id var with value from session 'user_id' key.
+	 Decorator @bp.before_app_requests() will activate the function no matter what page the user visited.
+	 Firstly we define user_id var with the value from session 'user_id' key.
 	 First if statement checks is user have not user_id in session object.(means user is not logged in)
 	 Else data from row with current user's id  will be added as a tuple to g.user object that stores information only for current session.
 
@@ -522,10 +531,190 @@ Flask is a simple web framework written in python.
 	 Define function, view means function with what decorator is used,  we will use it with blog.py functions.
 	 Next using functools we register login_requirred() as a decorator.
 	 wrapped_view() is function will be called by our decorator, (\*\*kwargs) means it can handle couple of views at the same time
-	 If g.user doesn't know current user, login_reqquired() will redirect user to authentication page.
-	 If g.user is defined decorator login_requirred() will return result of function on with it used for. 
+	 If g.user doesn't know the current user, login_reqquired() will redirect the user to the authentication page.
+	 If g.user is defined, the decorator login_requirred() will return the result of the function on which it was used for. 
 	 
 ***
+- ### Main page with posts(blog.py)
+	 In blog.py we define functions that fill index pages on url '/', and functions that allow users to create, update and delete posts on the main page.
+
+	 #### Import packages
+	 ```python
+	 from flask import (
+	    Blueprint, flash, g, redirect, render_template, request, url_for
+	)
+	from werkzeug.exceptions import abort
+
+	from flaskr.auth import login_required
+	from flaskr.db import get_db
+	```
+	 - flask (...) - couple of libraries that provide functionality to work with html templates and requests.
+	 - abort - function that return to user error page (404 at example)
+	 - @login_required - decorator defined in auth.by, that can block function to unregistered user.
+	 - get_db() - function that returns connection to database.
+
+	 #### define blog blueprint
+	 ```python
+	bp = Blueprint('blog', __name__) 
+	```
+	 Blueprint is the html file/template, default path is flaskr/templates.
+	 We register blueprint for blog pages, path to them will be flaskr/templates/blog.
+	 \_\_name\_\_ store name of our app, which will use this template.
+	 url_prefix for this blueprint is default '/', we don't need to specify it.
+
+	 #### get_post(), search for post in database by id
+	 ```python
+	def get_post(id, check_author=True):
+		db = get_db().cursor()
+		select = db.execute(
+			'SELECT p.id, title, body, created, author_id, username'
+			' FROM post p JOIN user u ON p.author_id = u.id'
+			' WHERE p.id = %s', (id,)
+		)
+		post = db.fetchone()
+
+		if post is None:
+			abort(404, f"Post id {id} doesn't exist")
+	
+		if check_author and post['author_id'] != g.user['id']:
+			abort(403)
+
+		return post 
+	```
+	 Define function with post id and check_author parameter which means this function can get_post even without defined author_id(it isn't used here)
+	 Next, get a connection to the database with a cursor, because we will use the execute() function separately.
+	 Next step: execute select SQL request that will return values from post table and synchronize author_id column with id column from user table.
+	 Define a post variable that will store post data from previous SQL execution as a tuple.
+	 If the post variable is None (post with this post_id didn't finded in database) status 404 page will be returned to the user.
+	 If the function didn't check the author, the status 403 page will be returned to the user.
+	 Finally get_post() returns the data of the post with the given id as a single tuple.
+
+	 #### index(), fill '/' page with latest posts
+	 ```python
+	@bp.route('/')
+	def index():
+		db = get_db().cursor()
+		select = db.execute(
+			'SELECT p.id, title, body, created, author_id, username'
+			' FROM post p JOIN user u ON p.author_id = u.id'
+			' ORDER BY created DESC'
+		)
+		posts = db.fetchall()
+		return render_template('blog/index.html', posts=posts)
+	```
+	 Decorator @bp.route() will transmit GET html requests from url '/' to function.
+	 Next get connection, name it db and add cursor() because we will use execute() separately.
+	 Next step is to execute select SQL request that will return values from the post table and synchronize the author_id column with the id column from the user table.
+	 After defining posts var that will store data from previous requests, where each row is a tuple.
+	 Finally return blog template with posts variable passed in it.
+
+	 ```python
+	@bp.route('/create', methods=('GET', 'POST'))
+	@login_required
+	def create():
+		if request.method == 'POST':
+			title = request.form['title']
+			body = request.form['body']
+			error = None
+	```
+	 Decorator @bp.route() will transmit GET and POST html requests from url '/create' to function.
+	 User is automatically redirected to /create when push the button "Create" in the top right corner.
+	 Decorator @login_required activate create() only if current user is logged in.
+	 In the body of this if statement we define variables title/body with values from the create form.
+	 Define variable error with default value None.
+
+	 ```python
+			if not title:
+				error = 'Title is required'
+			if error is not None:
+				flash(error)
+			else:
+				db = get_db()
+				db.cursor().execute(
+				     'INSERT INTO post (title, body, author_id)'
+					' VALUES (%s,%s,%s)', (title, body, g.user['id'])
+				)
+			     db.commit()
+				return redirect(url_for('blog.index'))
+     ```
+	 The Second if statement checks if the user didn't print any title, if yes the value of error var will be changed to message.
+	 The Third if statement triggered if value error is a message, this message will be displayed by function flash().
+	 Else value of error is None, get connection, name it db.
+	 Next execute insert SQL command with values from title and body, also add author_id from g.user.
+	 After the db.commit() function which saves these changes to the database, users will be redirected to index page '/'.
+
+	 ```python
+	    return render_template('blog/create.html') 
+	```
+	 create() function return to user create.html template by default.
+
+	 #### update(), function that allows users to change posts.
+	 ```python
+	@bp.route('/<int:id>/update', methods=('GET', 'POST'))
+	@login_required
+	def update(id):
+		post = get_post(id)
+
+		if request.method == 'POST':
+			title = request.form['title']
+			body = request.form['body']
+			error = None
+	```
+	 Decorator @bp.route() will transmit GET and POST html requests from url '/(post id)/update' to function.
+	 User is automatically redirected to /update when push the button "Update" in the top right corner.
+	 Decorator @login_required activates update() only if current user is logged in.
+	 Define variable post value from get_post() function, that returns post data from database by post id.
+	 In the body of this if statement we define variables title/body with values from the update form.
+	 Define variable error with default value None.
+
+	 ```python
+			if not title:
+				error = 'Title is required'
+
+			if error is not None:
+				flash(error)
+			else:
+				db = get_db()
+				db.cursor().execute(
+					'UPDATE post SET title = %s, body = %s WHERE id = %s',
+					(title, body, id)
+				)
+				db.commit()
+				return redirect(url_for('blog.index'))
+	```
+	 The Second if the statement checks if the user didn't print any title, if yes the value of error var will be changed to message.
+	 The Third if statement triggered if value error is a message, this message will be displayed by function flash().
+	 Else value of error is None, get connection, name it db.
+	 Next step is execute an update SQL command which will update row with current post id by values from title and body variables.
+	 After the db.commit() function which saves these changes to the database, user will be redirected to index page '/'.
+
+	 ```python
+		return render_template('blog/update.html', post=post) 
+	```
+	 update() function returns a user update.html template with data of the current post by default.
+
+	 #### delete(), function that allows user to delete post
+	 ```python
+	@bp.route('/<int:id>/delete', methods=('POST',))
+	@login_required
+	def delete(id):
+		get_post(id)
+		db = get_db()
+		db.execute('DELETE FROM post WHERE id = %s', (id,))
+		db.commit()
+
+		return redirect(url_for('blog.index'))
+	```
+	 Decorator @bp.route() will transmit POST html requests from url '/(post id)/delete' to function.
+	 User is automatically redirected to /delete when push the button "Create" in the top right corner.
+	 Decorator @login_required activates delete() only if current user is logged in.
+	 Define variable post value from get_post() function, that returns post data from database by post id.
+	 Get connection to the database.
+	 After we execute the DELETE SQL command that will delete row with current post id from the database.
+	 Finally the db.commit() function will save changes to the database, and the user will be redirected to index page '/'.
+	
+***
 To be continued...))
+
 
 
