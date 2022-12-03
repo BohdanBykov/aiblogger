@@ -15,7 +15,7 @@ Below you will find blocks about deploy and configuration of this project:
 	 - Set up database connection (db.py)
 	 - Implement authentication(auth.py)
 	 - Filling index page(blog.py)
-	 - Contain configuration
+	 - Configuration management(config.py)
 - Nginx and gunicorn
 - Docker compose
 - Ansible playbooks
@@ -712,9 +712,113 @@ Flask is a simple web framework written in python.
 	 Get connection to the database.
 	 After we execute the DELETE SQL command that will delete row with current post id from the database.
 	 Finally the db.commit() function will save changes to the database, and the user will be redirected to index page '/'.
-	
+
+***
+- ### Configuration management(config.py)
+
+	 #### Which parameters aiblogger app should store.
+	 - Flask
+		 - DEBUG - if True your wsgi will be automatically update site with changes in code (useful for develop)
+			 In production DEBUG should be false
+		- SECRET_KEY - key which will be used by the flask application to securely signing session cookie.
+	 - MySQL
+		- DBHOST - address of mysql server
+		- DBNAME - name of the database to which pymysql will connects 
+			(mysql server has separated databases with tables)
+		- DBUSER - username pymysql(db.py) will use to connect to the database
+		- DBPASS - password pymysql(db.py) will use to connect to the database
+
+	 #### config.py
+	 This file is in the root directory 'aiblogger/config.py', so you don't need to go too deep to change it.
+	 ```python
+	import os
+	# static settings
+	class Config(object):
+	   DEBUG = False
+        TESTING = False
+        
+        DBUSER = 'site'
+        DBNAME = 'site_db'
+
+	# when flask and mysql on one host
+	class Host(Config):
+        DBHOST = 'localhost'
+        DBPASS = 'password'
+        SECRET_KEY = 'dev'
+
+	# when mysql and flask in docker compose
+	class Dev(Config):
+        DBHOST = '172.18.0.2'
+        DBNAME = 'password'
+        SECRET_KEY = 'dev'
+	# when mysql server is remote
+	class Prod(Config):
+        DBHOST = os.environ['DBHOST']
+        DBPASS = os.environ['DBPASS']
+        SECRET_KEY = os.environ['SECRET_KEY']
+	``` 
+	 You can see parent class 'Config' and 3 child classes 'Host' 'Dev' and 'Prod' that inherit from it.
+	 In parent class 'Config' you see settings which will be used by each child class. 
+	 DEBUG and TESTING parameters you should set True in config you want to use for development.
+	 'Host' and 'Dev' I use to deploy on virtual machines so I don't need to hide data for them.
+	 'Prod' config I use to deploy on AWS EC2 and RDS, so I can't push parameters in the public github repo.
+	 To securely pass parameters I store them in environment variables DBHOST DBPASS and SECRET_KEY.
+	 While deploying Ansible, set them using values defined locally in the inventory file. 
+	 
+	 #### How app get configuration
+	 ```python
+	# __init__.py
+	def create_app():
+		app = Flask(__name__)
+		environ_config = os.environ['CONFIG']
+		app.config.from_object('config.' + environ_config) 
+	```
+	 environ_config is a variable which gets value from the environment variable CONFIG using os package.
+	 app.config.from_object('pathtofile.object') is construction by what flask app load configuration.
+	 For flask app 'aiblogger/' is a root directory, so 'aiblogger/config.py' will be just 'config.py'.
+	 Path to the config file is static, but the name of the object(class) can be Host,Dev or Prod. To specify one of them I use the environment variable CONFIG, value of what will be added after 'config.' as a variable environ_config.
+
+	 To set env var CONFIG in linux use code below:
+	 ```sh
+	export CONFIG='Host' 
+	``` 
+	 
+	 #### How ansible set env vars while deploy
+	 ```yml
+	#ops/ansible_playbooks/docker_deploy_aws.yaml 
+        - name: docker compose up
+          community.docker.docker_compose:
+            project_src: /home/ubuntu/aiblogger/ops/
+          
+          # aws:vars in hosts
+          environment:
+            CONFIG: "{{ config }}"
+            DBHOST: "{{ mysql_host }}"
+            DBPASS: "{{ mysql_pass }}"
+            SECRET_KEY: "{{ secret_key }}"
+          register: output
+	```
+	 This is ansible playbook stage where we start docker compose.
+	 In the last block we set environment variables that will be defined in docker containers.
+	 Values of these variables ansible take from inventory.
+	 By default ansible inventory is in file /etc/ansible/hosts.
+	 ```sh
+	[vm]
+	111.111.111.111
+
+	[vm:vars]
+	...
+	config = 'Prod'
+	mysql_host = '123.123.123.123'
+	mysql_pass = 'password'
+	secret_key = 'example_secret_key'
+	```
+	 It is an ordinary ansible inventory file in brackets \[vm\] you set name of the group, below them ip or domain name of target machines.
+	 In the next brackets \[vm:vars\] you specify parameters, there I create variables which I used in the playbook above.
+	 
 ***
 To be continued...))
+
 
 
 
