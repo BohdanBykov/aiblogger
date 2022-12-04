@@ -5,7 +5,6 @@
     hosts: aws
 
     tasks:
-
       - name: Apt update/install
         block:
         - name: apt update
@@ -20,6 +19,7 @@
               - curl
               - gnupg
               - lsb-release
+              - python3-pip
 
       - name: Install Docker
         block:
@@ -47,6 +47,11 @@
               - docker-compose-plugin
             update_cache: yes
 
+        # package that ansible will use
+        - name: pip install docker 
+          ansible.builtin.pip:
+            name: docker
+
         - name: create docker group
           ansible.builtin.group:
             name: docker
@@ -60,7 +65,7 @@
         - name: relogin to user
           ansible.builtin.meta: reset_connection
               
-      - name: Preparing for docker compose
+      - name: Preparing dirs and files for deploy 
         block:
         - name: clone aiblogger repo
           ansible.builtin.git:
@@ -68,39 +73,39 @@
             dest: /home/ubuntu/aiblogger
             version: dev
 
-        - name: create folder in aiblogger for mysql
-          file:
-            path: /srv/aiblogger
-            state: directory
-
-        - name: copy nginx.conf to aiblogger
+        - name: copy nginx.conf 
           ansible.builtin.copy:
             src: /home/ubuntu/aiblogger/ops/configs/docker_nginx.conf
             dest: /srv/aiblogger/nginx.conf
             remote_src: yes
 
-      - name: Deploy docker 
+        - name: create folder for mysql 
+          file:
+            path: /srv/aiblogger 
+            state: directory
+
+      - name: Start MySQL server
         block:
+        - name: start mysql server container
+          community.docker.docker_container:
+            name: mysql_db
+            image: mysql:8.0
+            state: started
+            env:
+              MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
+            networks:
+              - name: ops_ainet
+                ipv4_address: "172.18.0.2"
+            volumes:
+              - /srv/aiblogger/mysql:/var/lib/mysql
 
-        - name: apt install pip
-          ansible.builtin.apt: 
-            name: python3-pip
-
-        - name: pip install docker 
-          ansible.builtin.pip:
-            name: docker
-
-        - name: docker compose up
-          community.docker.docker_compose:
-            project_src: /home/ubuntu/aiblogger/ops/
-          register: output
         # wait mysql server to start
         - pause:
             seconds: 20
   
         - name: create site_db and site user in mysql
           community.docker.docker_container_exec:
-            container: ops_db_1
+            container: mysql_db
             command: |
               mysql -uroot -ppassword -e "
               CREATE DATABASE site_db;
@@ -108,6 +113,20 @@
               GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES ON `site_db`.`post` TO `site`@`172.18.0.3`;
               GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES ON `site_db`.`user` TO `site`@`172.18.0.3`;
               "
+
+      - name: Start aiblogger
+        block:
+        - name: docker compose up
+          community.docker.docker_compose:
+            project_src: /home/ubuntu/aiblogger/ops/
+          # vm:vars in hosts
+          environment:
+            CONFIG: "Test"
+            # next variables is used only in Prod config
+            DBHOST: "None"
+            DBPASS: "None"
+            SECRET_KEY: "None"
+          register: output
 
         - name: initialize the database for flask
           community.docker.docker_container_exec:

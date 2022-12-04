@@ -95,6 +95,7 @@
           
           # aws:vars in hosts
           environment:
+            CONFIG: "{{ config }}"
             DBHOST: "{{ mysql_host }}"
             DBPASS: "{{ mysql_pass }}"
             SECRET_KEY: "{{ secret_key }}"
