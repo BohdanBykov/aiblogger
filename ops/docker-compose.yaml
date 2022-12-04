@@ -1,25 +1,12 @@
 version: '3'
 
 services:
-
-  # db:
-  #   image: mysql
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=password
-  #   networks:
-  #     ainet:
-  #       ipv4_address: 172.18.0.2
-  #   expose:
-  #     - '3306'
-  #   volumes:
-  #     - /srv/aiblogger/mysql:/var/lib/mysql
-
   flask:
     build: 
       context: ../
       dockerfile: Dockerfile
     environment:
-      - CONFIG=Prod
+      - CONFIG=$CONFIG
       - DBHOST=$DBHOST
       - DBPASS=$DBPASS
       - SECRET_KEY=$SECRET_KEY
