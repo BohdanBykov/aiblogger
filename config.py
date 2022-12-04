@@ -14,9 +14,9 @@ class Host(Config):
         SECRET_KEY = 'dev'
 
 # when mysql and flask in docker compose
-class Dev(Config):
+class Test(Config):
         DBHOST = '172.18.0.2'
-        DBNAME = 'password'
+        DBPASS = 'password'
         SECRET_KEY = 'dev'
 
 # when mysql server remote
