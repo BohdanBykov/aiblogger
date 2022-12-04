@@ -4,84 +4,84 @@
     become: yes
 
     tasks:
-      # - name: Apt update/install
-      #   block:
-      #   - name: apt update
-      #     ansible.builtin.apt:
-      #       update_cache: yes
-      #       force_apt_get: yes
+      - name: Apt update/install
+        block:
+        - name: apt update
+          ansible.builtin.apt:
+            update_cache: yes
+            force_apt_get: yes
 
-      #   - name: apt get install ca-certificates, curl, gnupg, lsb-release
-      #     ansible.builtin.apt:
-      #       pkg: 
-      #         - ca-certificates
-      #         - curl
-      #         - gnupg
-      #         - lsb-release
-      #         - python3-pip
+        - name: apt get install ca-certificates, curl, gnupg, lsb-release
+          ansible.builtin.apt:
+            pkg: 
+              - ca-certificates
+              - curl
+              - gnupg
+              - lsb-release
+              - python3-pip
 
-      # - name: Install Docker
-      #   block:
-      #   - name: create folder for gpg key
-      #     ansible.builtin.shell: sudo mkdir -p /etc/apt/keyrings
+      - name: Install Docker
+        block:
+        - name: create folder for gpg key
+          ansible.builtin.shell: sudo mkdir -p /etc/apt/keyrings
 
-      #   - name: add gpg key
-      #     ansible.builtin.shell: |
-      #       curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-      #       sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg 
+        - name: add gpg key
+          ansible.builtin.shell: |
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+            sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg 
 
-      #   - name: add repo
-      #     ansible.builtin.shell: |
-      #       echo \
-      #       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      #       $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        - name: add repo
+          ansible.builtin.shell: |
+            echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
       
-      #   - name: install docker packages
-      #     ansible.builtin.apt: 
-      #       pkg: 
-      #         - docker-ce 
-      #         - docker-ce-cli 
-      #         - containerd.io 
-      #         - docker-compose
-      #         - docker-compose-plugin
-      #       update_cache: yes
+        - name: install docker packages
+          ansible.builtin.apt: 
+            pkg: 
+              - docker-ce 
+              - docker-ce-cli 
+              - containerd.io 
+              - docker-compose
+              - docker-compose-plugin
+            update_cache: yes
 
-      #   # package that ansible will use
-      #   - name: pip install docker 
-      #     ansible.builtin.pip:
-      #       name: docker
+        # package that ansible will use
+        - name: pip install docker 
+          ansible.builtin.pip:
+            name: docker
 
-      #   - name: create docker group
-      #     ansible.builtin.group:
-      #       name: docker
+        - name: create docker group
+          ansible.builtin.group:
+            name: docker
 
-      #   - name: add ubuntu to docker group
-      #     ansible.builtin.user: 
-      #       name: ubuntu
-      #       groups: docker
-      #       append: yes
+        - name: add ubuntu to docker group
+          ansible.builtin.user: 
+            name: ubuntu
+            groups: docker
+            append: yes
 
-      #   - name: relogin to user
-      #     ansible.builtin.meta: reset_connection
+        - name: relogin to user
+          ansible.builtin.meta: reset_connection
               
-      # - name: Preparing dirs and files for deploy 
-      #   block:
-      #   - name: clone aiblogger repo
-      #     ansible.builtin.git:
-      #       repo: https://github.com/BohdanBykov/aiblogger.git
-      #       dest: /home/ubuntu/aiblogger
-      #       version: dev
+      - name: Preparing dirs and files for deploy 
+        block:
+        - name: clone aiblogger repo
+          ansible.builtin.git:
+            repo: https://github.com/BohdanBykov/aiblogger.git
+            dest: /home/ubuntu/aiblogger
+            version: dev
 
-      #   - name: create folder /srv/aiblogger 
-      #     file:
-      #       path: /srv/aiblogger
-      #       state: directory
+        - name: create folder /srv/aiblogger 
+          file:
+            path: /srv/aiblogger
+            state: directory
 
-      #   - name: copy nginx.conf 
-      #     ansible.builtin.copy:
-      #       src: /home/ubuntu/aiblogger/ops/configs/docker_nginx.conf
-      #       dest: /srv/aiblogger/nginx.conf
-      #       remote_src: yes
+        - name: copy nginx.conf 
+          ansible.builtin.copy:
+            src: /home/ubuntu/aiblogger/ops/configs/docker_nginx.conf
+            dest: /srv/aiblogger/nginx.conf
+            remote_src: yes
 
       - name: start aiblogger and mysql containers
         block:
@@ -92,38 +92,38 @@
           environment:
             CONFIG: Test
             # next variables is used only in Prod config
-            DBHOST: test1231
+            DBHOST: None
             DBPASS: None
             SECRET_KEY: None
           register: output
 
-        # - name: start mysql server container
-        #   community.docker.docker_container:
-        #     name: mysql_db
-        #     image: mysql:8.0
-        #     state: started
-        #     env:
-        #       MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
-        #     networks:
-        #       - name: ops_ainet
-        #         ipv4_address: "172.18.0.2"
-        #     volumes:
-        #       - /srv/aiblogger/mysql:/var/lib/mysql
+        - name: start mysql server container
+          community.docker.docker_container:
+            name: mysql_db
+            image: mysql:8.0
+            state: started
+            env:
+              MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
+            networks:
+              - name: ops_ainet
+                ipv4_address: "172.18.0.2"
+            volumes:
+              - /srv/aiblogger/mysql:/var/lib/mysql
 
-        # # wait mysql server to start
-        # - pause:
-        #     seconds: 20
+        # wait mysql server to start
+        - pause:
+            seconds: 20
   
-        # - name: create site_db and site user in mysql
-        #   community.docker.docker_container_exec:
-        #     container: mysql_db
-        #     command: |
-        #       mysql -uroot -ppassword -e "
-        #       CREATE DATABASE site_db;
-        #       CREATE USER 'site'@'172.18.0.3' IDENTIFIED BY 'password';
-        #       GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES ON `site_db`.`post` TO `site`@`172.18.0.3`;
-        #       GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES ON `site_db`.`user` TO `site`@`172.18.0.3`;
-        #       "
+        - name: create site_db and site user in mysql
+          community.docker.docker_container_exec:
+            container: mysql_db
+            command: |
+              mysql -uroot -ppassword -e "
+              CREATE DATABASE site_db;
+              CREATE USER 'site'@'172.18.0.3' IDENTIFIED BY 'password';
+              GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES ON `site_db`.`post` TO `site`@`172.18.0.3`;
+              GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES ON `site_db`.`user` TO `site`@`172.18.0.3`;
+              "
 
         - name: initialize the database for flask
           community.docker.docker_container_exec:
