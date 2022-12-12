@@ -11,7 +11,7 @@ services:
       - DBPASS=$DBPASS
       - SECRET_KEY=$SECRET_KEY
 
-    command: sh -c "gunicorn --bind 0.0.0.0:8000 wsgi:app"
+    command: sh -c "cd /aiblogger && gunicorn --bind 0.0.0.0:8000 wsgi:app"
     networks:
       ainet:
         ipv4_address: 172.18.0.3   
