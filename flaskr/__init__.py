@@ -5,7 +5,8 @@ from flask import Flask
 def create_app():
     # create and configure the app
     app = Flask(__name__)
-    environ_config = os.environ['CONFIG']
+    # get config from env var CONFIG, if not default value Host
+    environ_config = os.environ.get('CONFIG', 'Host')
     app.config.from_object('config.' + environ_config)
 
     # test page
