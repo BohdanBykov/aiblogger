@@ -91,10 +91,6 @@
           # vm:vars in hosts
           environment:
             CONFIG: Test
-            # next variables is used only in Prod config
-            DBHOST: None
-            DBPASS: None
-            SECRET_KEY: None
           register: output
 
         - name: start mysql server container
@@ -128,7 +124,7 @@
         - name: initialize the database for flask
           community.docker.docker_container_exec:
             container: ops_flask_1
-            command: /bin/sh -c "flask init-db"
+            command: /bin/sh -c "flask --app '/aiblogger/flaskr' init-db"
 
       - name: get response from aiblogger site
         shell: curl localhost
