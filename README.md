@@ -817,7 +817,162 @@ Flask is a simple web framework written in python.
 	 In the next brackets \[vm:vars\] you specify parameters, there I create variables which I used in the playbook above.
 	 
 ***
+# Nginx and gunicorn
+
+Nginx is a fast multifunctional web server written in C language. 
+In this project it is used as a reverse proxy server, it will catch and redirect all http requests to gunicorn wsgi.
+
+WSGI is a web server gateway interface designed for web servers to forward requests to python web applications.
+Gunicorn is a WSGI server, it will transfer requests between Nginx and flask application. 
+
+- ### Configure app to work with wsgi and proxy server.
+	 ```python
+	# wsgi.py
+	from flaskr.__init__ import create_app
+	from werkzeug.middleware.proxy_fix import ProxyFix
+	import pymysql
+
+	app = ProxyFix(create_app(), x_for=1, x_host=1, x_proto=1)
+	```
+	 In the first row import create_app() function that stores our application.
+	 Next import ProxyFix package, using it we limit the count of proxy servers our app will trust.
+	 Finally create an app object using ProxyFix, to this object we pass our original app object, and parameters.
+	 
+	 Parameters you see are given by Nginx, and you will see it again in nginx docker config file.
+	 (x_for) X-Forwarded-For            sets remote address
+	 (x_host) X-Forwarder-Host        sets http_host, server_name and server_port
+	 (x_proto) X-Forwarded-Proto    sets wsgi.url_scheme.
+
+- ### Configure gunicorn
+
+	 #### Start gunicorn on host
+	 gunicorn must be installed by pip as  a python package.
+	 To start gunicorn as a server to flask app use the command below.
+	```sh
+	gunicorn --workers 3 wsgi:app
+	```
+	 This command will start the object "app" from the wsgi.py file.
+
+	 #### Start gunicorn in docker container(Test, Prod)
+	 ```yml
+	flask:
+	build: 
+		context: ../
+		dockerfile: Dockerfile
+	environment:
+		- CONFIG=$CONFIG
+		...
+	command: sh -c "cd /aiblogger && gunicorn --bind 0.0.0.0:8000 wsgi:app"
+	... 
+	```
+	 Details about how I use Docker will be in another block, but this code describes configuration which docker uses to build containers for our app.
+	 Last row is a command block, it will execute sh(shell) -c(command) right after container build. 
+	 This command is similar to previous but with --bind parameter instead of --workers.
+	 --bind 0.0.0.0:8000 means that the gunicorn server will be started on 0.0.0.0 address.
+	 0.0.0.0 address is special, it means that anybody can connect to the current machine.
+	 Practically nginx will connect to it by address 172.18.0.3 (address of container in docker compose).
+
+	 #### Start gunicorn as a unix service(Host)
+	 ```sh
+	#ops/configs/gunicorn.service
+	[Unit]
+	Description=gunicorn daemon
+	Requires=gunicorn.socket
+	After=network.target
+
+	[Service]
+	User=ubuntu
+	Group=ubuntu
+	WorkingDirectory=/srv/aiblogger
+	ExecStart=/srv/aiblogger/env/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn.sock \
+          wsgi:app
+
+	[Install]
+	WantedBy=multi-user.target
+	```
+	 This is a service unit that describes how to manage gunicorn application.
+	 In \[Unit] block you can see that gunicorn service requires gunicorn.socket, it will trigger service to start.
+	 Directive 'After=' means that network management software will be started before gunicorn service.
+	 In \[Service] block we execute a command that will start gunicorn binded to gunicorn.socket.
+	 While deploy process gunicorn.socket will copied to /etc/systemd/system directory
+
+	 ```sh
+	# ops/configs/gunicorn.socket
+	[Unit]
+	Description=gunicorn socket
+
+	[Socket]
+	ListenStream=/run/gunicorn.sock
+
+	[Install]
+	WantedBy=sockets.target
+	```
+	 This is a socket unit file that describes gunicorn socket work.
+	 It will create gunicorn.sock to which nginx will redirect requests.
+
+	 #### Nginx configuration(Host)
+	 ```sh
+	# ops/configs/host_nginx.conf
+	events {
+		worker_connections 1024;
+	}
+	http {
+		server{
+			listen      80;
+			server_name localhost;
+			
+			#default
+			access_log /var/log/nginx/access.log;
+			error_log  /var/log/nginx/error.log;
+			
+			location / {
+				include proxy_params;
+				proxy_pass http://unix:/run/gunicorn.sock;
+			}
+		}
+	}
+	```
+	 There you can see the nginx config file.
+	 In "events" block  we choose the count of connections each worker(nginx process) will operate.
+	 In "server" block we choose from what address nginx server will receive requests, by default localhost:80.
+
+	 #### Nginx configuration(Test, Prod)
+	 ```sh
+	# ops/configs/docker_nginx.conf
+	events {
+		worker_connections 1024;
+	}
+
+	http {
+		server{
+			listen      80;
+			server_name localhost;
+
+			#default
+			access_log /var/log/nginx/access.log;
+			error_log  /var/log/nginx/error.log;
+
+			location / {
+				proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+				proxy_set_header X-Forwarded-Proto $scheme;
+				proxy_set_header Host $http_host;
+
+				proxy_pass http://172.18.0.3:8000;
+			}
+		}
+	}
+	```
+	 Difference between host and docker nginx configs is in "location" block.
+	 For Docker deploy we specify the ip address of the docker container where gunicorn started serviceless.
+	 Also there are proxy parameters I specify manually.
+	 
+***
 To be continued...))
+
+
 
 
 
